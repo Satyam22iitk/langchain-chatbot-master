@@ -13,3 +13,4 @@ fastembed==0.4.2
 pypdf==5.1.0
 duckduckgo_search==7.0.1
 pydantic==2.10.6
+huggingface_hub==0.20.3
