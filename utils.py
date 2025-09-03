@@ -6,6 +6,7 @@ from streamlit.logger import get_logger
 from langchain_openai import ChatOpenAI
 from langchain_community.chat_models import ChatOllama
 from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
+from langchain_community.llms import HuggingFaceHub
 
 logger = get_logger('Langchain-Chatbot')
 
@@ -79,7 +80,7 @@ def choose_custom_openai_key():
     return model, openai_api_key
 
 def configure_llm():
-    available_llms = ["gpt-4.1-mini","llama3.2:3b","use your openai api key"]
+    available_llms = ["gpt-4.1-mini","llama3.2:3b","huggingface","use your openai api key"]
     llm_opt = st.sidebar.radio(
         label="LLM",
         options=available_llms,
@@ -88,11 +89,26 @@ def configure_llm():
 
     if llm_opt == "llama3.2:3b":
         llm = ChatOllama(model="llama3.2", base_url=st.secrets["OLLAMA_ENDPOINT"])
+
     elif llm_opt == "gpt-4.1-mini":
-        llm = ChatOpenAI(model_name=llm_opt, temperature=0, streaming=True, api_key=st.secrets["OPENAI_API_KEY"])
+        llm = ChatOpenAI(
+            model_name=llm_opt,
+            temperature=0,
+            streaming=True,
+            api_key=st.secrets["OPENAI_API_KEY"]
+        )
+
+    elif llm_opt == "huggingface":
+        llm = HuggingFaceHub(
+            repo_id="mistralai/Mistral-7B-Instruct-v0.2",
+            huggingfacehub_api_token=st.secrets["HUGGINGFACEHUB_API_TOKEN"],
+            model_kwargs={"temperature": 0.7, "max_new_tokens": 512}
+        )
+
     else:
         model, openai_api_key = choose_custom_openai_key()
         llm = ChatOpenAI(model_name=model, temperature=0, streaming=True, api_key=openai_api_key)
+
     return llm
 
 def print_qa(cls, question, answer):
