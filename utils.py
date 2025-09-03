@@ -40,12 +40,33 @@ def display_msg(msg, author):
     st.chat_message(author).write(msg)
 
 def configure_llm():
-    llm = HuggingFaceHub(
-        repo_id="google/flan-t5-base",
-        huggingfacehub_api_token=st.secrets["HUGGINGFACEHUB_API_TOKEN"],
-        model_kwargs={"temperature": 0.7, "max_new_tokens": 512}
+    available_llms = ["flan-t5-base (HF)", "mistral-7b (HF)"]
+    llm_opt = st.sidebar.radio(
+        label="Select HuggingFace Model",
+        options=available_llms,
+        key="SELECTED_HF_MODEL"
     )
+
+    if llm_opt == "flan-t5-base (HF)":
+        llm = HuggingFaceHub(
+            repo_id="google/flan-t5-base",
+            task="text2text-generation",
+            huggingfacehub_api_token=st.secrets["HUGGINGFACEHUB_API_TOKEN"],
+            model_kwargs={"temperature": 0.7, "max_length": 512}
+        )
+    elif llm_opt == "mistral-7b (HF)":
+        llm = HuggingFaceHub(
+            repo_id="mistralai/Mistral-7B-Instruct-v0.2",
+            task="text-generation",
+            huggingfacehub_api_token=st.secrets["HUGGINGFACEHUB_API_TOKEN"],
+            model_kwargs={"temperature": 0.7, "max_new_tokens": 512}
+        )
+    else:
+        st.error("Please select a model")
+        st.stop()
+
     return llm
+
 
 
 def print_qa(cls, question, answer):
