@@ -40,13 +40,13 @@ def display_msg(msg, author):
     st.chat_message(author).write(msg)
 
 def configure_llm():
-    # Only Hugging Face
     llm = HuggingFaceHub(
-        repo_id="mistralai/Mistral-7B-Instruct-v0.2",
+        repo_id="google/flan-t5-base",
         huggingfacehub_api_token=st.secrets["HUGGINGFACEHUB_API_TOKEN"],
         model_kwargs={"temperature": 0.7, "max_new_tokens": 512}
     )
     return llm
+
 
 def print_qa(cls, question, answer):
     log_str = "\nUsecase: {}\nQuestion: {}\nAnswer: {}\n" + "------"*10
